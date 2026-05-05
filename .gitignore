@@ -1,0 +1,28 @@
+cat <<EOT >> .gitignore
+
+# Python bytecode (remove the __pycache__ folders)
+__pycache__/
+*.pyc
+
+# Virtual environments
+venv/
+env/
+
+# Large assets from Depth-Anything-V2 that you probably don't want to host
+Depth-Anything-V2/assets/*.png
+Depth-Anything-V2/assets/*.jpg
+Depth-Anything-V2/assets_video/*.mp4
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Large tabular data (double check these patterns)
+data/*.csv
+data/tabular_data/
+data/train_test_splits/
+
+# Model weights
+*.pth
+*.onnx
+EOT
