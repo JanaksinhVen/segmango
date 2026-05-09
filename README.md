@@ -62,12 +62,12 @@ pip install pandas numpy scikit-learn torch matplotlib python-dotenv jupyter
 1. Run `data/dataset_download.ipynb` to download image and weather data from the Google Drive source.
 2. Install all imports required by that notebook in the environment first.
 3. Run `data/dataset_preprocessing.ipynb` to generate CSV files in `data/tabular_data/`.
+    - It contains train/test data preparation, feature generation, and linear regression baseline results.
+    - The repository is notebook-based and intentionally kept minimal; the notebooks are self-explanatory.
 
-## Notebook workflow
+## Run the 
 
-- `models/approach_1.ipynb` is the main notebook for approach-1 from the Segmango WACV paper.
-- It contains train/test data preparation, feature generation, and linear regression baseline results.
-- The repository is notebook-based and intentionally kept minimal; the notebooks are self-explanatory.
+- `python segmango_ssh/models/approach_1.py` is the main python file for approach-1 from the Segmango WACV paper.
 
 ## Project structure
 

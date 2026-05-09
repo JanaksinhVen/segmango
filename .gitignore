@@ -7,7 +7,7 @@ __pycache__/
 # Virtual environments
 venv/
 env/
-
+results/
 # Large assets from Depth-Anything-V2 that you probably don't want to host
 Depth-Anything-V2/assets/*.png
 Depth-Anything-V2/assets/*.jpg
