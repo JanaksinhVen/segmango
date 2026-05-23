@@ -28,6 +28,7 @@ from utils import (
 )
 from sklearn.metrics import mean_absolute_error, r2_score, mean_squared_error
 
+python models/approach_2.py --weather --scale --fold 0 --variant b1 --unfreez_epoch 30 --batch_size 8 
 
 def parse_args():
     """Parse command line arguments."""
