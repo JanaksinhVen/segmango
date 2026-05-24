@@ -68,7 +68,16 @@ python train_segmango_per_tree.py --weather --scale --fold 1 --variant b1 --unfr
 
 
 ## Inference Setup: 
-in next version
+Make sure to download the model weights for inference and save in the `segmango_ssh/data/Model_weights/approach-1/segmango` path.
+1. Image based model: 
+```
+# python segmango_ssh/models/approach_2/inference_segmango_image.py --image "segmango_ssh/02_10_02.jpg" --fold 1 --variant b1 --time 64
+```
+
+2. Per Tree based model:
+```
+
+```
 
 ## Notes
 

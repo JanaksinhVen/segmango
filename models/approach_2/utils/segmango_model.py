@@ -100,15 +100,18 @@ class SegFormerRegressor(nn.Module):
 
         print(f"[INFO] Using SegFormer-{variant.upper()} encoder with output dim {encoder_dim}")
         print(f"[INFO] Loading encoder weights from: {encoder_ckpt}")
-        ckpt = torch.load(encoder_ckpt, map_location='cpu')
-        if 'state_dict' in ckpt:
-            ckpt = ckpt['state_dict']
+        if encoder_ckpt is not None:
+            ckpt = torch.load(encoder_ckpt, map_location='cpu')
+            if 'state_dict' in ckpt:
+                ckpt = ckpt['state_dict']
 
-        # Remove 'backbone.' prefix from checkpoint keys
-        encoder_state = {k.replace('backbone.', ''): v for k, v in ckpt.items() if k.startswith('backbone.')}
-        missing, unexpected = self.encoder.load_state_dict(encoder_state, strict=False)
-        print(f"[INFO] Loaded encoder with missing keys: {missing}")
-        print(f"[INFO] Unexpected keys: {unexpected}")
+            # Remove 'backbone.' prefix from checkpoint keys
+            encoder_state = {k.replace('backbone.', ''): v for k, v in ckpt.items() if k.startswith('backbone.')}
+            missing, unexpected = self.encoder.load_state_dict(encoder_state, strict=False)
+            print(f"[INFO] Loaded encoder with missing keys: {missing}")
+            print(f"[INFO] Unexpected keys: {unexpected}")
+        else: 
+            print("[WARNING] No encoder checkpoint provided. Initializing with random weights.")
 
         if freeze_encoder:
             for p in self.encoder.parameters():
