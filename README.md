@@ -1,87 +1,74 @@
-# segmango
+# 🥭SegMango
 
-Notebook-first mango yield prediction project using segmentation-derived features and tabular regression.
+Mango yield prediction project using segmentation-derived features and tabular regression.
 
-## Installation
-
-### Setup environment
-
-Create and activate a conda environment:
-
-```bash
-conda create -n "openmmlab" python=3.8 -y
-conda activate openmmlab
+## Enviroment Setup: 
+Use the UV or conda to setup the environment using environment.yml requirement.txt files
+```
+conda env create -f environment.yml
+```
+```
+conda activate segmango
+pip install -r requirements.txt
 ```
 
-### Install PyTorch on GPU platform
+## Dataset Download
 
-```bash
-pip install torch==2.0.1 torchvision==0.15.2 --index-url https://download.pytorch.org/whl/cu118
+- Run `data/dataset_download.ipynb` to download image, manual count for final visit and weather data from the Google Drive source. 
+- It also downloads the required deplth anything model weights from the hugging face.
+
+## .env file setup
+- check the .env.example and rename it to .env
+- Also, update the data and repo dir
+
+## Dataset Preprocess
+- Run `models/dataset_preprocessing.ipynb` to generate CSV files in `data/tabular_data/`.
+- It contains train/test data preparation and feature generation.
+
+## Approach 1
+Run the
 ```
+python segmango_ssh/models/approach_1.py
+``` 
+is the main python file for approach-1 from the Segmango WACV paper.
 
-Test the installation:
+## Approach 2
 
-```bash
-python -c 'import torch; print(torch.__version__); print(torch.version.cuda)'
+### Step-1 (Segformer finetunning)
+- We will use the mmsegmantation library for the segformer finetunning on our dataset
+- Data preparation, model config setup and required commands for environments are given in the `segmango_ssh/models/segformer_training/main.ipynb`
+
+### Step-2 (Image based model: Segformer encoder + Regression Model)
+- This is stage-1 of the model training, here model will trained on images level data.
+- In the `segmango_ssh/models/approach_2` folder the dataloader, model and training script is written.
+1. To train the only image based input model:
 ```
-
-### Install MMCV using MIM
-
-```bash
-pip install -U openmim
-mim install mmengine
-mim install "mmcv==2.1.0"
+python train_segmango.py --fold 1 --variant b1 --unfreez_epoch 30
+``` 
+2. To train the image, weather and scale based input model:
 ```
+python train_segmango.py --weather --scale --fold 1 --variant b1 --unfreez_epoch 30
+``` 
 
-### Clone mmsegmentation repository
-
-```bash
-git clone -b main https://github.com/open-mmlab/mmsegmentation.git
-cd mmsegmentation
+### Step-3 (Tree based model: Segformer encoder + Regression + Regression Model)
+- This is stage-2 of the model training, here model will trained on tree level data (8 images of one tree as input).
+- In the `segmango_ssh/models/approach_2` folder the dataloader, model and training script is written.
+1. To train the only image based input model:
 ```
-
-### Install remaining dependencies
-
-```bash
-pip install -v -e .
-pip install ftfy
-pip install regex
-pip install "mmdet>=3.0.0rc4"
+python train_segmango_per_tree.py --fold 1 --variant b1 --unfreez_epoch 50
+``` 
+2. To train the image, weather and scale based input model:
 ```
+python train_segmango_per_tree.py --weather --scale --fold 1 --variant b1 --unfreez_epoch 50
+``` 
 
-### Install project-specific packages
 
-From the project root, install the Python packages used by the notebooks:
-
-```bash
-pip install pandas numpy scikit-learn torch matplotlib python-dotenv jupyter
-```
-
-## Data preparation flow
-
-1. Run `data/dataset_download.ipynb` to download image and weather data from the Google Drive source.
-2. Install all imports required by that notebook in the environment first.
-3. Run `data/dataset_preprocessing.ipynb` to generate CSV files in `data/tabular_data/`.
-    - It contains train/test data preparation, feature generation, and linear regression baseline results.
-    - The repository is notebook-based and intentionally kept minimal; the notebooks are self-explanatory.
-
-## Run the 
-
-- `python segmango_ssh/models/approach_1.py` is the main python file for approach-1 from the Segmango WACV paper.
 
 ## Project structure
 
-- `Depth-Anything-V2/`: segmentation/depth model code.
-- `data/`: raw weather files, generated CSVs, model weights, and split files.
-- `data/dataset_download.ipynb`: download dataset assets.
-- `data/dataset_preprocessing.ipynb`: preprocess images and weather into tabular CSVs.
-- `models/approach_1.ipynb`: approach-1 experiment.
-- `utils/`: helper utilities.
 
-## Next steps
-
-- `approach-1` is complete for the current baseline.
-- Work on `approach-2` is planned next.
+## Inference Setup: 
+in next version
 
 ## Notes
 
@@ -89,6 +76,24 @@ pip install pandas numpy scikit-learn torch matplotlib python-dotenv jupyter
 - Use the `.env` file for `ROOT_DIR` and `DATA_DIR` paths if needed.
 - This README is intentionally concise because the notebooks contain the detailed workflow.
 
-
+## Citation
+```
+@InProceedings{Ven_2026_WACV,
+    author    = {Ven, Janaksinh and Sharma, Charu and Syed, Azeemuddin},
+    title     = {SegMango: Early Deep Mango Yield Prediction based on Flower Segmentation and Weather Data},
+    booktitle = {Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision (WACV)},
+    month     = {March},
+    year      = {2026},
+    pages     = {4984-4993}
+}
+```
+<!-- ```
+@inproceedings{xie2021segformer,
+  title={SegFormer: Simple and Efficient Design for Semantic Segmentation with Transformers},
+  author={Xie, Enze and Wang, Wenhai and Yu, Zhiding and Anandkumar, Anima and Alvarez, Jose M and Luo, Ping},
+  booktitle={Neural Information Processing Systems (NeurIPS)},
+  year={2021}
+}
+``` -->
 
 
