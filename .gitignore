@@ -26,3 +26,7 @@ data/train_test_splits/
 *.pth
 *.onnx
 EOT
+
+# .sh file to run the training script on the cluster
+models/approach_2/s_run_approch_2.bash
+models/segformer_training/s_run.sh

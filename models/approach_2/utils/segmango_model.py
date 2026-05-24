@@ -63,7 +63,11 @@ class SegFormerRegressor(nn.Module):
                  variant: str = "b1",                  # 'b0' or 'b1'
                  num_extra_feats: int = 0,
                  hidden_dim: int = 256,
-                 freeze_encoder: bool = False):
+                 
+                 freeze_encoder: bool = False,
+                 freeze_regressor: bool = False
+                 ):
+                 
         super().__init__()
 
         assert variant in ['b0', 'b1'], "Only 'b0' and 'b1' variants are supported"
@@ -129,6 +133,12 @@ class SegFormerRegressor(nn.Module):
             nn.Dropout(0.2),
             nn.Linear(hidden_dim, 1)
         )
+        if freeze_regressor:
+            for p in self.regressor.parameters():
+                p.requires_grad = False
+            for p in self.fusion_layer.parameters():
+                p.requires_grad = False
+
 
     def forward(self, img, extra_feats=None):
         feat_map = self.encoder(img)[0]                # shape: (B, encoder_dim, H/32, W/32)
@@ -143,7 +153,53 @@ class SegFormerRegressor(nn.Module):
             
         return self.regressor(fused_feats)
 
+
+
     def unfreeze_encoder(self):
         for p in self.encoder.parameters():
             p.requires_grad = True
         print("[INFO] Encoder has been unfrozen.")
+
+    def unfreeze_regressor(self):
+        for p in self.regressor.parameters():
+            p.requires_grad = True
+        for p in self.fusion_layer.parameters():
+            p.requires_grad = True
+        print('[INFO] Regressor has been unfrozen')
+
+
+
+class MultiImageSegFormerRegressor(nn.Module):
+    def __init__(self, base_model: nn.Module, num_inputs: int = 8, hidden_dim: int = 32):
+        """
+        base_model: The SegFormerRegressor model.
+        num_inputs: Number of images per sample (default 8).
+        hidden_dim: Hidden layer dimension in the second-stage MLP.
+        """
+        super().__init__()
+        self.base_model = base_model
+        self.num_inputs = num_inputs
+
+        # Final regressor over 8 outputs
+        self.final_regressor = nn.Sequential(
+            nn.Linear(num_inputs, hidden_dim),
+            nn.ReLU(inplace=True),
+            nn.Linear(hidden_dim, 1)
+        )
+
+    def forward(self, imgs, extra_feats=None):
+        """
+        imgs        : Tensor[B, 8, 3, H, W]
+        extra_feats : Tensor[B, 8, F] or None
+        """
+        B, N, C, H, W = imgs.shape
+        assert N == self.num_inputs, f"Expected {self.num_inputs} images, got {N}"
+
+        imgs = imgs.view(B * N, C, H, W)  # (B*N, 3, H, W)
+        if extra_feats is not None:
+            extra_feats = extra_feats.view(B * N, -1).float()   # (B*N, F)
+        # print('extra_feats:',extra_feats.shape)
+        preds = self.base_model(imgs, extra_feats)     # (B*N, 1)
+        preds = preds.view(B, N)                       # (B, 8)
+
+        return self.final_regressor(preds)             # (B, 1)
