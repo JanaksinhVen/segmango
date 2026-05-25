@@ -68,19 +68,21 @@ python train_segmango_per_tree.py --weather --scale --fold 1 --variant b1 --unfr
 
 
 ## Inference Setup: 
-Make sure to download the model weights for inference and save in the `segmango_ssh/data/Model_weights/approach-1/segmango` path.
+Make sure to download the model weights for inference from the [Model_weights](https://drive.google.com/drive/folders/1sNoiWYTv0ul0wrIjCxQ4SQ5nYsJhv4pA?usp=sharing) and save in the `segmango_ssh/data/Model_weights/approach-1/segmango path.
 1. Image based model: 
 ```
-# python segmango_ssh/models/approach_2/inference_segmango_image.py --image "segmango_ssh/02_10_02.jpg" --fold 1 --variant b1 --time 64
+# python segmango_ssh/models/approach_2/inference_segmango_image.py --image "home/user/data/Dataset_images_2024/02_10_02.jpg" --fold 1 --variant b1 --time 64
 ```
 
 2. Per Tree based model:
 ```
-
+python inference_segmango_per_tree.py --image_prefix "/home/user/data/Dataset_images_2024/02_10_" --csv_path "/home/user/Segmango_project/segmango_ssh/data/mlp_all_data_with_time_weather_scale_treewise_2024.csv" --fold 1 --variant b1 --weather --scale
 ```
 
 ## Notes
-
+- [MangoSense2024 Dataset](https://drive.google.com/drive/folders/1yaXyAVl0defyBm4LeuzsaEt_hthCR9x7?usp=drive_link)
+- [MangoSense2025 Dataset](https://drive.google.com/drive/folders/1PQFARiv9QRwRSCEdilj321cB8z4X-0VN?usp=drive_link)
+- **Alert**: In the model weight save folder the approch-1 folder actually contains all the weights for the both approaches.
 - Keep the conda environment active when running notebooks.
 - Use the `.env` file for `ROOT_DIR` and `DATA_DIR` paths if needed.
 - This README is intentionally concise because the notebooks contain the detailed workflow.
@@ -96,6 +98,9 @@ Make sure to download the model weights for inference and save in the `segmango_
     pages     = {4984-4993}
 }
 ```
+[Research Paper URL](https://openaccess.thecvf.com/content/WACV2026/html/Ven_SegMango_Early_Deep_Mango_Yield_Prediction_based_on_Flower_Segmentation_WACV_2026_paper.html)
+
+## My Profile: [Janaksinh Ven](https://janaksinhven.github.io/)
 <!-- ```
 @inproceedings{xie2021segformer,
   title={SegFormer: Simple and Efficient Design for Semantic Segmentation with Transformers},
