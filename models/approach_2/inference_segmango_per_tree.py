@@ -116,8 +116,7 @@ def main():
         transformed_payload = val_test_transform(image=img_matrix)
         processed_images.append(transformed_payload['image'])
         
-        # 2. Match view code against 'image_name_o' column in CSV 
-        # Accounts for your format mapping (e.g., matching input prefix run names to data log names)
+
         matching_row = csv_df[csv_df['image_name_o'].astype(str) == filename_without_ext]
         
         if matching_row.empty:

@@ -77,9 +77,6 @@ def plot_training_curves(train_losses, val_losses,
 def parse_args():
     parser = argparse.ArgumentParser(description="Training script arguments")
 
-    # parser.add_argument('--tree_n', type=int, required=True, help='tree number for iso-tree validation')
-    # parser.add_argument('--new_tree', action='store_true', help='Include weather features')
-
     parser.add_argument('--weather', action='store_true', help='Include weather features')
     parser.add_argument('--scale', action='store_true', help='Include scale features')
     parser.add_argument('--fold', type=int, required=True, help='Fold number for cross-validation')
@@ -102,24 +99,11 @@ if __name__=='__main__':
         feature_columns.extend(['scale_sum_r_o','scale_max_r_o', 'scale_std_r_o'])
     feature_length = len(feature_columns)
     print('feature_columns:',feature_length)
-    # print('tree number:',args.tree_n,args.new_tree)
-    # feature_columns = ['time',
-    # 'scale_sum_r', 'scale_max_r', 'scale_std_r',
-    #         'temp','dew','precip','precipprob','visibility','solarradiation','severerisk',
-    #         'preciptype','winddir','windgust','windspeed']
-
     batch_size = args.batch_size
     unfreeze_epoch = args.unfreez_epoch
-    # save_path = f"/home2/janakv/yield_pred/code/checkpoints/folds/fold_seg_reg_{args.fold}_{feature_length}_{args.variant}.pth"
-    # plot_path = f'/home2/janakv/yield_pred/code/seg_reg_resutls/fold_seg_reg_{args.fold}_{feature_length}_{args.variant}.png'
 
-    # save_scalers_of_features = f'/home2/janakv/yield_pred/code/checkpoints/S_fold_seg_reg_{args.fold}_{feature_length}_{args.variant}.pkl'
     print('Model variant:', args.variant)
 
-
-
-
-    # encoder_ckpt_path = "/home2/janakv/yield_pred/work_dirs/segformer_768_sbatch_1/best_mIoU_iter_23000.pth"
 
     if args.variant=='b0':
         save_path = f"{project_root_dir}/data/Model_weights/approach-1/segmango/fold_seg_reg_{args.fold}_{feature_length}_{args.variant}_attention.pth"
@@ -127,12 +111,10 @@ if __name__=='__main__':
         save_scalers_of_features = f'{project_root_dir}/data/Model_weights/approach-1/segmango/S_fold_seg_reg_{args.fold}_{feature_length}_{args.variant}_attention.pkl'
 
         folder = f"{project_root_dir}/models/segformer_training/work_dirs/segformer_512_sbatch"
-        # folder = f"{project_root_dir}/yield_pred/work_dirs/segformer_768_sbatch_1_fold_{args.fold}_{args.variant}"
     else:
         save_path = f"{project_root_dir}/data/Model_weights/approach-1/segmango/fold_seg_reg_{args.fold}_{feature_length}_attention.pth"
         plot_path = f'{project_root_dir}/results/fold_seg_reg_{args.fold}_{feature_length}_attention.png'
         save_scalers_of_features = f'{project_root_dir}/data/Model_weights/approach-1/segmango/S_fold_seg_reg_{args.fold}_{feature_length}_attention.pkl'
-        # folder = f"/home2/janakv/yield_pred/work_dirs/segformer_768_sbatch_1_fold_{args.fold}"
         folder = f"{project_root_dir}/models/segformer_training/work_dirs/segformer_512_sbatch"
 
 
@@ -393,9 +375,6 @@ if __name__=='__main__':
     print("✅ Loaded checkpoint with cleaned keys.")
     print("Missing keys:", missing)
     print("Unexpected keys:", unexpected)
-
-    # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    # print(f"Using device: {device}")
 
     # Move model to device
     model = model.to(device)

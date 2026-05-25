@@ -38,9 +38,6 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 def parse_args():
     parser = argparse.ArgumentParser(description="Training script arguments")
 
-    # parser.add_argument('--tree_n', type=int, required=True, help='tree number for iso-tree validation')
-    # parser.add_argument('--new_tree', action='store_true', help='Include weather features')
-
     parser.add_argument('--weather', action='store_true', help='Include weather features')
     parser.add_argument('--scale', action='store_true', help='Include scale features')
     parser.add_argument('--fold', type=int, required=True, help='Fold number for cross-validation')
@@ -63,24 +60,11 @@ if __name__=='__main__':
         feature_columns.extend(['scale_sum_r_o','scale_max_r_o', 'scale_std_r_o'])
     feature_length = len(feature_columns)
     print('feature_columns:',feature_length)
-    # print('tree number:',args.tree_n,args.new_tree)
-    # feature_columns = ['time',
-    # 'scale_sum_r', 'scale_max_r', 'scale_std_r',
-    #         'temp','dew','precip','precipprob','visibility','solarradiation','severerisk',
-    #         'preciptype','winddir','windgust','windspeed']
-
+    
     batch_size = args.batch_size
     unfreeze_epoch = args.unfreez_epoch
-    # save_path = f"/home2/janakv/yield_pred/code/checkpoints/folds/fold_seg_reg_{args.fold}_{feature_length}_{args.variant}.pth"
-    # plot_path = f'/home2/janakv/yield_pred/code/seg_reg_resutls/fold_seg_reg_{args.fold}_{feature_length}_{args.variant}.png'
-
-    # save_scalers_of_features = f'/home2/janakv/yield_pred/code/checkpoints/S_fold_seg_reg_{args.fold}_{feature_length}_{args.variant}.pkl'
+    
     print('Model variant:', args.variant)
-
-
-
-
-    # encoder_ckpt_path = "/home2/janakv/yield_pred/work_dirs/segformer_768_sbatch_1/best_mIoU_iter_23000.pth"
 
     if args.variant=='b0':
         save_path = f"{project_root_dir}/data/Model_weights/approach-1/segmango/fold_seg_reg_{args.fold}_{feature_length}_{args.variant}_attention.pth"
@@ -89,15 +73,13 @@ if __name__=='__main__':
         save_scalers_of_features = f'{project_root_dir}/data/Model_weights/approach-1/segmango/S_fold_seg_reg_{args.fold}_{feature_length}_{args.variant}_attention.pkl'
 
         folder = f"{project_root_dir}/models/segformer_training/work_dirs/segformer_512_sbatch"
-        # folder = f"{project_root_dir}/yield_pred/work_dirs/segformer_768_sbatch_1_fold_{args.fold}_{args.variant}"
+        
     else:
         save_path = f"{project_root_dir}/data/Model_weights/approach-1/segmango/fold_seg_reg_{args.fold}_{feature_length}_attention.pth"
         save_path_PT = f'{project_root_dir}/data/Model_weights/approach-1/segmango/best_model_per_tree_{args.fold}_{feature_length}_attention.pth'
         save_plot_ = f'{project_root_dir}/results/fold_seg_reg_{args.fold}_{feature_length}_attention.png'
         save_scalers_of_features = f'{project_root_dir}/data/Model_weights/approach-1/segmango/S_fold_seg_reg_{args.fold}_{feature_length}_attention.pkl'
-        # folder = f"/home2/janakv/yield_pred/work_dirs/segformer_768_sbatch_1_fold_{args.fold}"
         folder = f"{project_root_dir}/models/segformer_training/work_dirs/segformer_512_sbatch"
-
 
     # List all files in the folder
     all_files = os.listdir(folder)
@@ -121,16 +103,9 @@ if __name__=='__main__':
 
     def list_of_tree(df):
         lines = df['image_name']
-        # with open(file_path,'r') as f:
-        #     lines = f.readlines()
-        # for i,line in enumerate(lines):
-        #     lines[i]=lines[i].split('\n')[0]
-        #     if line.split('_')[0]+'_'+line.split('_')[1]=='N_03':
-        #         lines[i]=lines[i].replace('N_03','N_01')
+
         print(len(lines))
         return list({ '_'.join(f.split('_')[:-1]) for f in lines})
-
-
 
     train_df = pd.read_csv(f"{project_root_dir}/data/train_test_splits/train_split_{args.fold}.csv")
     val_df = pd.read_csv(f"{project_root_dir}/data/train_test_splits/val_split_{args.fold}.csv")
@@ -146,9 +121,6 @@ if __name__=='__main__':
 
     # Save this for inference later
     joblib.dump(scaler, save_scalers_of_features)
-
-
-
 
     image_folders = [f'{data_base_path}/Dataset_images_2024', f'{data_base_path}/Dataset_images_2025']
     image_size = 768
@@ -232,19 +204,11 @@ if __name__=='__main__':
     print("Missing keys:", missing)
     print("Unexpected keys:", unexpected)
 
-    # for image, features, targets in tqdm(train_loader):
-    #     print(image.shape, features.shape, targets.shape)
-    #     break
-
     model = MultiImageSegFormerRegressor(base_model=seg_reg_model).to(device)
 
-
     # Setup
-    # unfreeze_epoch = 50
     criterion = nn.MSELoss()
-    # optimizer = optim.Adam(model.parameters(), lr=1e-4)
     optimizer = optim.Adam(model.parameters(), lr=1e-4)
-    # scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=5, verbose=True)
     scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=10, verbose=True)
 
     model.to(device)
@@ -257,7 +221,6 @@ if __name__=='__main__':
     train_maes, val_maes = [], []
     train_mses, val_mses = [], []
     early_stop = 0
-    # early_stop_t = 10
     early_stop_t = 30
 
     for epoch in range(num_epochs):
@@ -348,24 +311,6 @@ if __name__=='__main__':
             print('early_stop triggered!!')
             break
 
-    # epochs = range(1, num_epochs + 1)
-
-    # def plot_metric(train_values, val_values, metric_name):
-    #     plt.plot(epochs, train_values, 'b-', label=f"Train {metric_name}")
-    #     plt.plot(epochs, val_values, 'r-', label=f"Val {metric_name}")
-    #     plt.xlabel("Epochs")
-    #     plt.ylabel(metric_name)
-    #     plt.title(f"{metric_name} Over Epochs")
-    #     plt.legend()
-    #     plt.grid(True)
-    #     plt.show()
-
-    # # Plot all metrics
-    # plot_metric(train_losses, val_losses, "Loss")
-    # plot_metric(train_r2s, val_r2s, "R² Score")
-    # plot_metric(train_maes, val_maes, "MAE")
-    # plot_metric(train_mses, val_mses, "MSE")
-
 
     epochs = range(1, len(train_losses) + 1)
 
@@ -414,8 +359,6 @@ if __name__=='__main__':
     plt.savefig(save_plot_, dpi=300)
     plt.show()
 
-
-    # load_path = '/home2/janakv/yield_pred/code/checkpoints/best_model_overall_per_tree_1.pth'
     load_path=save_path_PT
     def remove_module_prefix(state_dict):
         """Removes 'module.' prefix from keys in a state_dict"""

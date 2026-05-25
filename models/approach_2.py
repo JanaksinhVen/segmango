@@ -28,7 +28,7 @@ from utils import (
 )
 from sklearn.metrics import mean_absolute_error, r2_score, mean_squared_error
 
-python models/approach_2.py --weather --scale --fold 0 --variant b1 --unfreez_epoch 30 --batch_size 8 
+# python models/approach_2.py --weather --scale --fold 0 --variant b1 --unfreez_epoch 30 --batch_size 8 
 
 def parse_args():
     """Parse command line arguments."""
@@ -162,7 +162,6 @@ def get_segformer_checkpoint(args):
         # Try without variant suffix
         folder = os.path.join(
             ROOT_DIR,
-            # f"work_dirs/segformer_768_sbatch_1_fold_{fold_suffix}"
             "data/Model_weights/approach-1/segformer/"
         )
     
@@ -194,9 +193,7 @@ def setup_data(args, feature_columns):
         f"test_{args.fold}.txt"
     )
     
-    # train_df, val_df, test_df = get_dataframes_from_splits(
-    #     full_df, train_file, val_file, test_file
-    # )
+
     train_df = pd.read_csv(os.path.join(
         isotree_split_dir,
         f"train_split_{args.fold}.csv".format(args.fold))

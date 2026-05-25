@@ -87,21 +87,12 @@ class FruitDataset_per_tree(Dataset):
 
         images = torch.stack(images)  # (8, 3, H, W)
 
-        # row = self.data.iloc[idx]
-        # image_name = row['image_name']
-        # image_path = self.find_image_path(image_name)
-        # image = Image.open(image_path).convert('RGB')
-        # if self.transform:
-        #     image = self.transform(image)
         tree_ = self.list_of_trees[idx]
         img_names = [tree_+f'_0{i+1}' for i in range(8)]
         feature_df = self.data[self.data['image_name'].isin(img_names)][self.feature_columns]
         
-        # targets_ = self.data[self.data['image_name'].isin(img_names)]['n_fruit_o']
         if self.scaler is not None:
             features = self.scaler.transform(feature_df)  # 💡 Normalize
-
-
 
         if not tree_.startswith('N_'):
             row_n = tree_.split('_')[-1]
@@ -111,15 +102,6 @@ class FruitDataset_per_tree(Dataset):
             row_n = 'N_' + tree_.split('_')[-1]
             targets_ =  self.manual_csv[self.manual_csv['Tree_number'] == row_n]['count'].values[0]
 
-        # # Tabular features
-        # feature_df = pd.DataFrame([row[self.feature_columns].values], columns=self.feature_columns)
-        # # features = row[self.feature_columns].values.astype('float32').reshape(1, -1)
-        # if self.scaler is not None:
-        #     features = self.scaler.transform(feature_df)  # 💡 Normalize
-        # features = torch.tensor(features.squeeze(), dtype=torch.float32)
-
-        # Regression target
-        # target = torch.tensor(float(row['n_fruit_o']), dtype=torch.float32)
         targets = torch.tensor(targets_.astype(np.float32), dtype=torch.float32)
 
         return images, features, targets

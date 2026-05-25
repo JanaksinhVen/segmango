@@ -30,7 +30,6 @@ class SelfAttentionFusion(nn.Module):
         extra_proj = self.extra_proj(extra_feat).unsqueeze(1)    # (B, 1, H)
         
         # Concatenate and create the input for attention
-        # combined_features = torch.cat([visual_proj, extra_proj], dim=1) # (B, 2, H)
         combined_features = self.alpha * visual_proj + self.beta * extra_proj
 
         # Calculate Q, K, V
@@ -147,8 +146,6 @@ class SegFormerRegressor(nn.Module):
         feat_map = self.encoder(img)[0]                # shape: (B, encoder_dim, H/32, W/32)
         feat_vec = self.pool(feat_map).flatten(1)      # shape: (B, encoder_dim)
 
-        # if extra_feats is not None:
-        #     feat_vec = torch.cat([feat_vec, extra_feats], dim=1)
         if extra_feats is not None:
             fused_feats = self.fusion_layer(feat_vec, extra_feats)
         else:
