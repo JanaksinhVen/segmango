@@ -7,7 +7,7 @@ __pycache__/
 # Virtual environments
 venv/
 env/
-
+results/
 # Large assets from Depth-Anything-V2 that you probably don't want to host
 Depth-Anything-V2/assets/*.png
 Depth-Anything-V2/assets/*.jpg
@@ -26,3 +26,10 @@ data/train_test_splits/
 *.pth
 *.onnx
 EOT
+
+# .sh file to run the training script on the cluster
+models/approach_2/s_run_approch_2.bash
+models/segformer_training/s_run.sh
+
+
+*.env
